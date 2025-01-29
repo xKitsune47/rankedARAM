@@ -1,14 +1,17 @@
 # RankedARAM
-A discord bot made for me and my friends to create ourselves a little leaderbord to have a little playful competition between us.
+
+A discord bot made for me and my friends to create ourselves a little leaderboard to have a little playful competition between us.
 
 Made using Express framework with mongoose as the library for MongoDB database.
 
 ## Technologies and libraries used:
-- JavaScript
-- NodeJS (Express)
-- MongoDB
-- mongoose
-- discord.js
+
+-   JavaScript
+-   NodeJS (Express)
+-   MongoDB
+-   mongoose
+-   discord.js
+
 ## Commands list
 
 #### List all commands and their shortened description
@@ -46,4 +49,3 @@ Made using Express framework with mongoose as the library for MongoDB database.
 ```
 /leaderboard
 ```
-

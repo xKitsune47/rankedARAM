@@ -23,7 +23,9 @@ module.exports = {
             usersToShow.push({
                 name:
                     "```" +
-                    `${user.name.padEnd(16, " ")} ${user.points}` +
+                    `${user.name.padEnd(16, " ")} ${
+                        Math.round(user.points * 100) / 100
+                    }` +
                     "```",
                 value: ` `,
             });

@@ -2,3 +2,5 @@ config.*
 .env
 node_modules
 config.json
+test.*
+clear.*

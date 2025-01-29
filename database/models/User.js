@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     puuid: String,
     matchesId: Array,
     stats: Object,
+    joinTime: Number,
 });
 
 module.exports = mongoose.models.User || mongoose.model("User", userSchema);

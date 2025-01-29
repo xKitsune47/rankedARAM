@@ -52,14 +52,3 @@ mongoose.connect(mongo_connection, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
-
-// info.participants[i].summonerName/riotIdGameName
-// info.participant[i].totalDamageTaken/totalDamageDealtToChampions/totalHeal/deaths/kills
-
-// zmniejszenie uzycia api ritotu:
-// tam gdzie jest fetchMatchDetails(matchId, puuid) dodac klauzule
-// ktora pobiera i sprawdza czy dla kazdego puuid w grze dla osob w druzynie
-// z osoba ktora byla sprawdzana znajduje sie osoba w bazie danych,
-// jesli tak to dla tej osoby tez sprawdzane sa statystyki ALE bez callowania API
-// mecze sprawdzone dodaje OD RAZU do bazy danych, jeszcze przed pobraniem listy dla
-// kolejnego uzytkownika

@@ -32,6 +32,7 @@ async function addAccount(data, discordID) {
             puuid: puuid,
             matchesId: [],
             stats: { points: 0, wins: 0, losses: 0 },
+            joinTime: new Date().getTime(),
         });
 
         await user.save();
