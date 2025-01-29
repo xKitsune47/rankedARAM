@@ -230,9 +230,6 @@ function startAutoRefresh() {
     console.log("Auto-refresh timer restarted");
 }
 
-// Uruchamiamy pierwszy auto-refresh i timer przy starcie
-startAutoRefresh();
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("refresh")
