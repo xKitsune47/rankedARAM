@@ -112,7 +112,7 @@ function calculatePlace(team, value, type) {
     const position = sorted.indexOf(value) + 1;
 
     if (type === "kp") {
-        return Math.round(+value * 100) / 100;
+        return Math.round(+value * 100) / 3;
     }
 
     switch (position) {
@@ -141,7 +141,7 @@ async function updateUserStats(puuid, points, win, matchId) {
     const updatedPoints = win
         ? {
               kills: points.kills * 1.5,
-              deaths: points.deaths * 0.5,
+              deaths: points.deaths * -0.5,
               dmg: points.dmg * 2,
               tanked: points.tanked * 2,
               heal: points.heal * 2,
@@ -150,12 +150,12 @@ async function updateUserStats(puuid, points, win, matchId) {
           }
         : {
               kills: points.kills * 0.5,
-              deaths: points.deaths,
+              deaths: points.deaths * -1,
               dmg: points.dmg * 1,
               tanked: points.tanked * 1,
               heal: points.heal * 1,
               participation: points.participation * 0.5,
-              lose: -35,
+              win: -35,
           };
 
     const totalPoints = Object.values(updatedPoints).reduce(
@@ -251,7 +251,6 @@ module.exports = {
 
         try {
             await interaction.deferReply();
-
             let users = await User.find();
 
             if (users.length === 0) {
@@ -265,7 +264,7 @@ module.exports = {
 
             await performRefresh(interaction);
 
-            // Resetujemy timer auto-refresha po udanym manualnym odświeżeniu
+            // restarting the timer after successful refresh
             startAutoRefresh();
 
             await interaction.editReply(
@@ -286,6 +285,3 @@ module.exports = {
         }
     },
 };
-
-// info.participants[i].summonerName/riotIdGameName
-// info.participant[i].totalDamageTaken/totalDamageDealtToChampions/totalHeal/deaths/kills
