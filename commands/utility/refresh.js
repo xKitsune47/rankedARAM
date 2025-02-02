@@ -150,7 +150,9 @@ async function updateUserStats(puuid, points, win, matchId) {
     });
     // early return if the match for a user already exists
     if (user) {
-        console.log(`Match ${matchId} already exists for user ${puuid}`);
+        console.log(
+            `${new Date()} Match ${matchId} already exists for user ${puuid}`
+        );
         return;
     }
 
@@ -208,7 +210,11 @@ async function performRefresh(interaction = null) {
 
         // if auto-refresh => log to console
         if (!interaction) {
-            console.log(`Starting auto-refresh for ${users.length} users...`);
+            console.log(
+                `${new Date()} Starting auto-refresh for ${
+                    users.length
+                } users...`
+            );
         }
 
         // fetching matches for every user in the database
@@ -220,7 +226,11 @@ async function performRefresh(interaction = null) {
 
         // if auto-refresh complete => log to console
         if (!interaction) {
-            console.log(`Auto-refresh completed for ${users.length} users!`);
+            console.log(
+                `${new Date()} Auto-refresh completed for ${
+                    users.length
+                } users!`
+            );
         }
     } catch (err) {
         // error handling
@@ -245,7 +255,7 @@ function startAutoRefresh() {
 
     // new timer
     autoRefreshTimer = setInterval(performRefresh, AUTO_REFRESH_INTERVAL);
-    console.log("Auto-refresh timer restarted");
+    console.log(`${new Date()} Auto-refresh timer restarted`);
 }
 
 module.exports = {
