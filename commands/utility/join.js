@@ -20,6 +20,7 @@ module.exports = {
 
         let msg;
         try {
+            // player's PUUID fetch
             const res = await fetch(
                 `${API_URL}/riot/account/v1/accounts/by-riot-id/${accName[0]}/${accName[1]}?api_key=${API_KEY}`
             );
@@ -30,12 +31,10 @@ module.exports = {
         }
 
         accName = accName.join("#").replace("%20", " ");
-        if (await msg) {
+        if (msg) {
             await interaction.reply(`Added **${accName}** to the database`);
         } else {
-            await interaction.reply(
-                `User **${accName}** already in the database!`
-            );
+            await interaction.reply(`${interaction}`);
         }
     },
 };

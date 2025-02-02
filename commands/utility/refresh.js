@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require("discord.js");
 const User = require("../../database/models/User");
 const { API_KEY, API_URL, match_count } = require("../../config.json");
 
+// fetching matches for the player
 async function fetchUserMatches(puuid) {
     try {
         const res = await fetch(
@@ -10,6 +11,7 @@ async function fetchUserMatches(puuid) {
         const matches = await res.json();
         await processNewMatches(puuid, matches);
     } catch (err) {
+        // error handling
         console.error(err);
     }
 }
@@ -23,6 +25,7 @@ async function processNewMatches(puuid, matches) {
         (matchId) => !existingMatchIds.has(matchId)
     );
 
+    // if no new matches => return early
     if (newMatches.length === 0) return;
 
     // process each new match
@@ -50,7 +53,7 @@ async function processMatch(matchId, puuid, joinTime) {
         const dbUsers = await User.find().select("puuid");
         const dbUserPuuids = new Set(dbUsers.map((user) => user.puuid));
 
-        // processing for the team of the player
+        // processing ONLY for the team of the player
         const team =
             playerNumber <= 4
                 ? matchData.info.participants.slice(0, 5)
@@ -63,17 +66,21 @@ async function processMatch(matchId, puuid, joinTime) {
                 .killParticipation
         );
     } catch (err) {
+        // error handling
         console.error(`Error processing match ${matchId}:`, err);
     }
 }
 
 async function processTeam(teamData, dbUserPuuids, matchId, ptp) {
+    // filtering players for those that are already in the database
     const relevantPlayers = teamData.filter((player) =>
         dbUserPuuids.has(player.puuid)
     );
 
+    // early return if there are no players in the database
     if (relevantPlayers.length === 0) return;
 
+    // creating a list of each stat for the team
     const teamStats = {
         damage: teamData.map((p) => p.totalDamageDealtToChampions),
         tanked: teamData.map((p) => p.totalDamageTaken),
@@ -81,14 +88,17 @@ async function processTeam(teamData, dbUserPuuids, matchId, ptp) {
         deaths: teamData.map((p) => p.deaths),
         kills: teamData.map((p) => p.kills),
         participation: teamData.map((p) => p.challenges.killParticipation),
+        assists: teamData.map((p) => p.assists),
     };
 
+    // calculating points for each relevant player (player that's in the database)
     for (const player of relevantPlayers) {
         const points = calculatePlayerPoints(player, teamStats);
         await updateUserStats(player.puuid, points, player.win, matchId);
     }
 }
 
+// calculating points for each relevant stat
 function calculatePlayerPoints(player, teamStats) {
     return {
         kills: +player.kills * 2,
@@ -104,17 +114,21 @@ function calculatePlayerPoints(player, teamStats) {
             player.challenges.killParticipation,
             "kp"
         ),
+        assists: +player.assists * 1.5,
     };
 }
 
+// calculating place points for: k/d/a/kp/healed/tanked/dealt
 function calculatePlace(team, value, type) {
     const sorted = [...team].sort((a, b) => b - a);
     const position = sorted.indexOf(value) + 1;
 
+    // points for kill participation
     if (type === "kp") {
         return Math.round(+value * 100) / 3;
     }
 
+    // points for k/d/a/healed/tanked/dealt
     switch (position) {
         case 1:
             return 5;
@@ -127,35 +141,40 @@ function calculatePlace(team, value, type) {
     }
 }
 
+// updating stats in the database for the user
 async function updateUserStats(puuid, points, win, matchId) {
+    // checking if match already exists for the user
     const user = await User.findOne({
         puuid,
         "matchesId.id": matchId,
     });
-
+    // early return if the match for a user already exists
     if (user) {
         console.log(`Match ${matchId} already exists for user ${puuid}`);
         return;
     }
 
+    // calculating updated points for win or lose
     const updatedPoints = win
         ? {
               kills: points.kills * 1.5,
-              deaths: points.deaths * -0.5,
-              dmg: points.dmg * 2,
-              tanked: points.tanked * 2,
-              heal: points.heal * 2,
-              participation: points.participation,
+              deaths: points.deaths * 0.75,
+              dmg: points.dmg * 1.8,
+              tanked: points.tanked * 1.8,
+              heal: points.heal * 1.8,
+              participation: points.participation * 0.6,
+              assists: points.assists * 0.9,
               win: 25,
           }
         : {
-              kills: points.kills * 0.5,
-              deaths: points.deaths * -1,
-              dmg: points.dmg * 1,
-              tanked: points.tanked * 1,
-              heal: points.heal * 1,
-              participation: points.participation * 0.5,
-              win: -35,
+              kills: points.kills * 0.45,
+              deaths: points.deaths * 1.25,
+              dmg: points.dmg * 0.9,
+              tanked: points.tanked * 0.9,
+              heal: points.heal * 0.9,
+              participation: points.participation * 0.25,
+              assists: points.assists * 0.75,
+              win: -50,
           };
 
     const totalPoints = Object.values(updatedPoints).reduce(
@@ -178,34 +197,33 @@ async function updateUserStats(puuid, points, win, matchId) {
 
 let lastRefreshTime = 0;
 const COOLDOWN = 125000;
-const AUTO_REFRESH_INTERVAL = 3 * 60 * 60 * 1000; // 3 godziny w milisekundach
-let autoRefreshTimer; // Zmienna do przechowywania timera
+const AUTO_REFRESH_INTERVAL = 3 * 60 * 60 * 1000; // 3hrs in milliseconds
+let autoRefreshTimer; // timer variable
 
-// Funkcja wykonująca odświeżanie
+// refreshing function
 async function performRefresh(interaction = null) {
     try {
+        // fetching users from the database
         let users = await User.find();
 
-        if (users.length === 0) {
-            if (interaction) await interaction.editReply("No users added yet!");
-            return;
-        }
-
-        // Jeśli to auto-refresh (bez interakcji), logujemy do konsoli
+        // if auto-refresh => log to console
         if (!interaction) {
             console.log(`Starting auto-refresh for ${users.length} users...`);
         }
 
+        // fetching matches for every user in the database
         for (const user of users) {
             await fetchUserMatches(user.puuid);
         }
 
         lastRefreshTime = Date.now();
 
+        // if auto-refresh complete => log to console
         if (!interaction) {
             console.log(`Auto-refresh completed for ${users.length} users!`);
         }
     } catch (err) {
+        // error handling
         console.error("Refresh error:", err);
         if (interaction?.deferred) {
             await interaction.editReply("An error occurred while refreshing!");
@@ -218,14 +236,14 @@ async function performRefresh(interaction = null) {
     }
 }
 
-// Funkcja do zarządzania auto-refreshem
+// auto-refresh function
 function startAutoRefresh() {
-    // Czyścimy poprzedni timer jeśli istnieje
+    // clearing previous timer
     if (autoRefreshTimer) {
         clearInterval(autoRefreshTimer);
     }
 
-    // Ustawiamy nowy timer
+    // new timer
     autoRefreshTimer = setInterval(performRefresh, AUTO_REFRESH_INTERVAL);
     console.log("Auto-refresh timer restarted");
 }
@@ -241,6 +259,7 @@ module.exports = {
             (AUTO_REFRESH_INTERVAL - timeElapsed) / 1000 / 60
         );
 
+        // checking if the refresh command is on cooldown
         if (timeElapsed < COOLDOWN) {
             const remainingTime = Math.ceil((COOLDOWN - timeElapsed) / 1000);
             await interaction.reply({
@@ -253,6 +272,7 @@ module.exports = {
             await interaction.deferReply();
             let users = await User.find();
 
+            // if there are no users in the database => early return
             if (users.length === 0) {
                 await interaction.editReply("No users added yet!");
                 return;
@@ -271,6 +291,7 @@ module.exports = {
                 `Successfully refreshed ${users.length} users! Next auto-refresh in 3 hours.`
             );
         } catch (err) {
+            // error handling
             console.error(err);
             if (interaction.deferred) {
                 await interaction.editReply(
