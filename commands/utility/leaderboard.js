@@ -49,3 +49,14 @@ module.exports = {
         });
     },
 };
+
+// placeholder function for future use for calculating player's rank to show
+function calculateRank(points) {
+    switch (points) {
+        case points:
+            break;
+
+        default:
+            break;
+    }
+}
