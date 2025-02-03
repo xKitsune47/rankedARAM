@@ -1,6 +1,19 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const User = require("../../database/models/User");
-const { API_KEY, API_URL, match_count } = require("../../config.json");
+const {
+    API_KEY,
+    API_URL,
+    dthWin,
+    dthLose,
+    killWin,
+    killLose,
+    deathWin,
+    deathLose,
+    participationWin,
+    participationLose,
+    assistWin,
+    assistLose,
+} = require("../../config.json");
 
 async function fetchMatch(puuid) {
     try {
@@ -54,23 +67,23 @@ async function processMatch(matchData, puuid) {
 
     return player.win
         ? {
-              kills: points.kills * 1.5,
-              deaths: points.deaths * 0.75,
-              dmg: points.dmg * 1.8,
-              tanked: points.tanked * 1.8,
-              heal: points.heal * 1.8,
-              participation: points.participation * 0.6,
-              assists: points.assists * 0.9,
+              kills: points.kills * killWin,
+              deaths: points.deaths * deathWin,
+              dmg: points.dmg * dthWin,
+              tanked: points.tanked * dthWin,
+              heal: points.heal * dthWin,
+              participation: points.participation * participationWin,
+              assists: points.assists * assistWin,
               win: 25,
           }
         : {
-              kills: points.kills * 0.45,
-              deaths: points.deaths * 1.25,
-              dmg: points.dmg * 0.9,
-              tanked: points.tanked * 0.9,
-              heal: points.heal * 0.9,
-              participation: points.participation * 0.25,
-              assists: points.assists * 0.75,
+              kills: points.kills * killLose,
+              deaths: points.deaths * deathLose,
+              dmg: points.dmg * dthLose,
+              tanked: points.tanked * dthLose,
+              heal: points.heal * dthLose,
+              participation: points.participation * participationLose,
+              assists: points.assists * assistLose,
               win: -50,
           };
 }
