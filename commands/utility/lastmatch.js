@@ -159,7 +159,7 @@ module.exports = {
             name:
                 "```" +
                 `${"Total points".padEnd(16, " ")} ${Object.values(
-                    updatedPoints
+                    playerPoints
                 ).reduce((sum, val) => sum + val, 0)}` +
                 "```",
             value: ` `,
