@@ -155,6 +155,16 @@ module.exports = {
         }
 
         const statsToShow = [];
+        statsToShow.push({
+            name:
+                "```" +
+                `${"Total points".padEnd(16, " ")} ${Object.values(
+                    updatedPoints
+                ).reduce((sum, val) => sum + val, 0)}` +
+                "```",
+            value: ` `,
+        });
+
         for (const [key, value] of Object.entries(playerPoints)) {
             if (key === "win") {
                 statsToShow.push({
