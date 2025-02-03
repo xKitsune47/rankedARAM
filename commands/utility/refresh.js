@@ -105,7 +105,7 @@ function calculatePlayerPoints(player, teamStats) {
             player.challenges.killParticipation,
             "kp"
         ),
-        assists: +player.assists * 1.5,
+        assists: +player.assists / 4.5,
     };
 }
 
