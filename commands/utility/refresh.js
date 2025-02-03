@@ -58,20 +58,14 @@ async function processMatch(matchId, puuid, joinTime) {
             playerNumber <= 4
                 ? matchData.info.participants.slice(0, 5)
                 : matchData.info.participants.slice(5);
-        await processTeam(
-            team,
-            dbUserPuuids,
-            matchId,
-            matchData.info.participants[playerNumber].challenges
-                .killParticipation
-        );
+        await processTeam(team, dbUserPuuids, matchId);
     } catch (err) {
         // error handling
         console.error(`Error processing match ${matchId}:`, err);
     }
 }
 
-async function processTeam(teamData, dbUserPuuids, matchId, ptp) {
+async function processTeam(teamData, dbUserPuuids, matchId) {
     // filtering players for those that are already in the database
     const relevantPlayers = teamData.filter((player) =>
         dbUserPuuids.has(player.puuid)
@@ -85,10 +79,7 @@ async function processTeam(teamData, dbUserPuuids, matchId, ptp) {
         damage: teamData.map((p) => p.totalDamageDealtToChampions),
         tanked: teamData.map((p) => p.totalDamageTaken),
         heal: teamData.map((p) => p.totalHeal),
-        deaths: teamData.map((p) => p.deaths),
-        kills: teamData.map((p) => p.kills),
         participation: teamData.map((p) => p.challenges.killParticipation),
-        assists: teamData.map((p) => p.assists),
     };
 
     // calculating points for each relevant player (player that's in the database)
@@ -151,7 +142,7 @@ async function updateUserStats(puuid, points, win, matchId) {
     // early return if the match for a user already exists
     if (user) {
         console.log(
-            `${new Date()} Match ${matchId} already exists for user ${puuid}`
+            `${new Date().toISOString()} Match ${matchId} already exists for user ${puuid}`
         );
         return;
     }
@@ -211,7 +202,7 @@ async function performRefresh(interaction = null) {
         // if auto-refresh => log to console
         if (!interaction) {
             console.log(
-                `${new Date()} Starting auto-refresh for ${
+                `${new Date().toISOString()} Starting auto-refresh for ${
                     users.length
                 } users...`
             );
@@ -227,7 +218,7 @@ async function performRefresh(interaction = null) {
         // if auto-refresh complete => log to console
         if (!interaction) {
             console.log(
-                `${new Date()} Auto-refresh completed for ${
+                `${new Date().toISOString()} Auto-refresh completed for ${
                     users.length
                 } users!`
             );
@@ -255,7 +246,7 @@ function startAutoRefresh() {
 
     // new timer
     autoRefreshTimer = setInterval(performRefresh, AUTO_REFRESH_INTERVAL);
-    console.log(`${new Date()} Auto-refresh timer restarted`);
+    console.log(`${new Date().toISOString()} Auto-refresh timer restarted`);
 }
 
 module.exports = {
