@@ -14,7 +14,7 @@ const {
     assistWin,
     assistLose,
 } = require("../../config.json");
-import roundObject from "../../methods/rounding";
+const { roundObject } = require("../../methods/rounding");
 
 async function fetchMatch(puuid) {
     try {
