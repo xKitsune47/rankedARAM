@@ -14,6 +14,7 @@ const {
     assistWin,
     assistLose,
 } = require("../../config.json");
+import roundObject from "../../methods/rounding";
 
 async function fetchMatch(puuid) {
     try {
@@ -158,9 +159,9 @@ module.exports = {
         statsToShow.push({
             name:
                 "```" +
-                `${"Total points".padEnd(16, " ")} ${Object.values(
+                `${"Total points".padEnd(16, " ")} ${roundObject(
                     playerPoints
-                ).reduce((sum, val) => sum + val, 0)}` +
+                )}` +
                 "```",
             value: ` `,
         });

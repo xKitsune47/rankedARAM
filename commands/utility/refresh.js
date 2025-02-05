@@ -15,6 +15,7 @@ const {
     assistWin,
     assistLose,
 } = require("../../config.json");
+import roundObject from "../../methods/rounding";
 
 // fetching matches for the player
 async function fetchUserMatches(puuid) {
@@ -184,17 +185,12 @@ async function updateUserStats(puuid, points, win, matchId) {
               win: -50,
           };
 
-    const totalPoints = Object.values(updatedPoints).reduce(
-        (sum, val) => sum + val,
-        0
-    );
-
     await User.updateOne(
         { puuid },
         {
             $push: { matchesId: { id: matchId, used: true } },
             $inc: {
-                "stats.points": Math.round(totalPoints * 100) / 100,
+                "stats.points": roundObject(updatedPoints),
                 "stats.wins": win ? 1 : 0,
                 "stats.losses": win ? 0 : 1,
             },
