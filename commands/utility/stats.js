@@ -48,7 +48,10 @@ module.exports = {
             })
             .setTitle(`${dbData.fullAccName}`)
             .addFields(
-                { name: "**Points**", value: `${dbData.stats.points}` },
+                {
+                    name: "**Points**",
+                    value: `${Math.round(dbData.stats.points * 100) / 100}`,
+                },
                 {
                     name: "**Wins**",
                     value: `${dbData.stats.wins}`,
