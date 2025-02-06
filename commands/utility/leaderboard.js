@@ -52,6 +52,8 @@ module.exports = {
 
 // placeholder function for future use for calculating player's rank to show
 function calculateRank(points) {
+    // each case write in ascending order so the lowest ones are checked first
+    // and if if encouters a "true" it'll run for that case
     switch (points) {
         case points:
             break;
