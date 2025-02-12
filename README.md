@@ -1,3 +1,5 @@
+## Honestly: fuck riot, this shitshow of a company should go down as hard as they made their way up to top of the charts of highest earning games of all time, this project will be continued to practice my skills on backend development but I'm not gonna ever play their games ever again. Fuck. Riot.
+
 # RankedARAM
 
 A discord bot made for me and my friends to create ourselves a little leaderboard to have a little playful competition between us.
